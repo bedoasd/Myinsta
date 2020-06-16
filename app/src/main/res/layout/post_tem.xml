@@ -75,7 +75,6 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="10likes"
             android:textSize="16sp"
             android:textStyle="bold"
             android:textColor="?android:colorPrimaryDark"
@@ -85,7 +84,6 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="username"
             android:textSize="16sp"
             android:textStyle="bold"
             android:textColor="?android:colorPrimaryDark"
@@ -96,7 +94,6 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="description"
             android:textSize="16sp"
             android:textStyle="bold"
             android:id="@+id/description"
