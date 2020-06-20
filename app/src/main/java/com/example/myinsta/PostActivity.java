@@ -110,7 +110,7 @@ public class PostActivity extends AppCompatActivity {
                            Uri downloaduri = task.getResult();
                            myUri = downloaduri.toString();
 
-                           DatabaseReference reference = FirebaseDatabase.getInstance().getReference("posts");
+                           DatabaseReference reference = FirebaseDatabase.getInstance().getReference("Posts");
 
                            String postid = reference.push().getKey();
 
@@ -126,7 +126,8 @@ public class PostActivity extends AppCompatActivity {
                            startActivity(new Intent(PostActivity.this, MainActivity.class));
 
                            finish();
-                       }else
+                       }
+                       else
                        {
                            Toast.makeText(PostActivity.this, "Failed", Toast.LENGTH_SHORT).show();
                        }
