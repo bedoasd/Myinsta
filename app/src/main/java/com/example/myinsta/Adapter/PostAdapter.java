@@ -1,6 +1,7 @@
 package com.example.myinsta.Adapter;
 
 import android.content.Context;
+import android.content.Intent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -11,6 +12,7 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
+import com.example.myinsta.CommentsActivity;
 import com.example.myinsta.Model.Post;
 import com.example.myinsta.Model.Users;
 import com.example.myinsta.R;
@@ -50,8 +52,7 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolder> {
         final Post post=mPost.get(position);
         Glide.with(mcontext).load(post.getPostimage()).into(holder.post_image);
 
-        isliked(post.getPostid(),holder.like);
-        nrlikes(holder.likes,post.getPostid());
+
 
         holder.like.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -69,6 +70,27 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolder> {
             }
         });
 
+        holder.comment.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent=new Intent(mcontext, CommentsActivity.class);
+                intent.putExtra("postid",post.getPostid());
+                intent.putExtra("publisherid",post.getPublisher());
+                mcontext.startActivity(intent);
+
+            }
+        });
+        holder.comments.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent=new Intent(mcontext, CommentsActivity.class);
+                intent.putExtra("postid",post.getPostid());
+                intent.putExtra("publisherid",post.getPublisher());
+                mcontext.startActivity(intent);
+
+            }
+        });
+
 
         if ("".equalsIgnoreCase(post.getDescription()))
         {
@@ -78,6 +100,10 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolder> {
             holder.description.setText(post.getDescription());
         }
         PublisherInfo(holder.image_profile,holder.username,holder.publisher,post.getPublisher());
+
+        isliked(post.getPostid(),holder.like);
+        nrlikes(holder.likes,post.getPostid());
+        getcomments(post.getPostid(),holder.comments);
 
     }
 
@@ -106,6 +132,22 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolder> {
             description=itemView.findViewById(R.id.description);
 
         }
+    }
+    private void getcomments(String postid, final TextView comments){
+        DatabaseReference reference=FirebaseDatabase.getInstance().getReference().child("Comments").child(postid);
+        reference.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+           comments.setText("View All"+" "+(dataSnapshot.getChildrenCount()-1)+"comments");
+
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
+
     }
 
     private void isliked(final String postid , final ImageView imageView){
