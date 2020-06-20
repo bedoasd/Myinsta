@@ -138,7 +138,7 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolder> {
         reference.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-           comments.setText("View All"+" "+(dataSnapshot.getChildrenCount()-1)+"comments");
+           comments.setText("View All"+" "+dataSnapshot.getChildrenCount()+"comments");
 
             }
 
