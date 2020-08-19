@@ -102,7 +102,8 @@ public class CommentsActivity extends AppCompatActivity {
         HashMap<String,Object>hashMap=new HashMap();
         hashMap.put("comment",addcomment.getText().toString());
         hashMap.put("publisher",firebaseUser.getUid());
-        reference.setValue(hashMap);
+
+        reference.push().setValue(hashMap);
         addcomment.setText("");
     }
     private void getImage(){
@@ -122,16 +123,17 @@ public class CommentsActivity extends AppCompatActivity {
         });
     }
     private void readcomments(){
-        DatabaseReference reference=FirebaseDatabase.getInstance().getReference().child("Comments").child(postid);
+        DatabaseReference reference=FirebaseDatabase.getInstance().getReference("Comments").child(postid);
         reference.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 commenttList.clear();
                 for (DataSnapshot snapshot:dataSnapshot.getChildren()){
-                    Commentt commentt=dataSnapshot.getValue(Commentt.class);
-                    commenttList.add(commentt);
+                    Commentt comment=snapshot.getValue(Commentt.class);
+                    commenttList.add(comment);
 
                 }
+
 
                 commentAdapter.notifyDataSetChanged();
             }

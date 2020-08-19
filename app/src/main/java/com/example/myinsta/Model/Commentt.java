@@ -1,6 +1,6 @@
 package com.example.myinsta.Model;
 
-public class Commentt {
+public class  Commentt {
     private String comment;
     private String publisher;
 

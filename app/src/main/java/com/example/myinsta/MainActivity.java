@@ -16,7 +16,7 @@ import com.example.myinsta.Fragment.searchFragment;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.firebase.auth.FirebaseAuth;
 
-public class MainActivity extends AppCompatActivity {
+public class  MainActivity extends AppCompatActivity {
 
     private BottomNavigationView bottomNavigationView;
     Fragment selectedfragment=null;
@@ -33,6 +33,7 @@ public class MainActivity extends AppCompatActivity {
         if (intent!=null){
             String publisherid=intent.getString("publisherid");
             SharedPreferences.Editor editor=getSharedPreferences("PREFS",MODE_PRIVATE).edit();
+            editor.putString("profileid",publisherid);
             editor.apply();
 
             getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container
