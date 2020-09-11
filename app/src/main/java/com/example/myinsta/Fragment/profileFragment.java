@@ -6,6 +6,9 @@ import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.GridLayoutManager;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import android.view.LayoutInflater;
 import android.view.View;
@@ -16,6 +19,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
+import com.example.myinsta.Adapter.MyFotosAdapter;
 import com.example.myinsta.Model.Post;
 import com.example.myinsta.Model.Users;
 import com.example.myinsta.R;
@@ -27,11 +31,27 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
+import java.util.concurrent.locks.ReentrantLock;
+
 public class profileFragment extends Fragment {
 
     ImageView image_profile,options;
     TextView posts,followers,following,full_name,bio,username;
     Button edit_profile;
+
+    private List<String> mysaves;
+    RecyclerView recyclerView_saves;
+    MyFotosAdapter myfotosAdapter_saves;
+    List<Post> postList_saves;
+
+    RecyclerView recyclerView;
+    MyFotosAdapter myfotosAdapter;
+    List<Post> postList;
+
 
     FirebaseUser firebaseUser;
     String profileid;
@@ -61,9 +81,32 @@ public class profileFragment extends Fragment {
         saved_fotos=view.findViewById(R.id.saved_fotos);
         edit_profile=view.findViewById(R.id.edit_profile);
 
+        recyclerView=view.findViewById(R.id.recycler_view);
+        recyclerView.setHasFixedSize(true);
+        LinearLayoutManager linearLayoutManager=new GridLayoutManager(getContext(),3);
+        recyclerView.setLayoutManager(linearLayoutManager);
+        postList=new ArrayList<>();
+        myfotosAdapter=new MyFotosAdapter(getContext(),postList);
+        recyclerView.setAdapter(myfotosAdapter);
+
+
+        recyclerView_saves=view.findViewById(R.id.recycler_view_saved);
+        recyclerView_saves.setHasFixedSize(true);
+        LinearLayoutManager linearLayoutManager_saves=new GridLayoutManager(getContext(),3);
+        recyclerView_saves.setLayoutManager(linearLayoutManager_saves);
+        postList_saves=new ArrayList<>();
+        myfotosAdapter_saves=new MyFotosAdapter(getContext(),postList_saves);
+        recyclerView_saves.setAdapter(myfotosAdapter_saves);
+
+         recyclerView.setVisibility(View.VISIBLE);
+         recyclerView_saves.setVisibility(View.GONE);
+
         UserInfo();
         getfollowers();
         getNroposts();
+        MyFotos();
+        MySaves();
+
 
         if (profileid.equals(firebaseUser.getUid())){
             edit_profile.setText("Edit Profile");
@@ -95,6 +138,23 @@ public class profileFragment extends Fragment {
                 }
             }
         });
+
+       my_fotos.setOnClickListener(new View.OnClickListener() {
+           @Override
+           public void onClick(View view) {
+               recyclerView.setVisibility(View.VISIBLE);
+               recyclerView_saves.setVisibility(View.GONE);
+           }
+       });
+
+       saved_fotos.setOnClickListener(new View.OnClickListener() {
+           @Override
+           public void onClick(View view) {
+               recyclerView.setVisibility(View.GONE);
+               recyclerView_saves.setVisibility(View.VISIBLE);
+
+           }
+       });
 
         return view ;
 
@@ -192,6 +252,79 @@ public class profileFragment extends Fragment {
                     }
                 }
                 posts.setText(""+i);
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
+    }
+    private void MyFotos(){
+        DatabaseReference reference=FirebaseDatabase.getInstance().getReference("Posts");
+        reference.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                postList.clear();
+                for(DataSnapshot snapshot : dataSnapshot.getChildren()){
+                    Post post=snapshot.getValue(Post.class);
+                    if (post.getPublisher().equals(profileid)){
+                    postList.add(post);
+                    }
+                }
+                Collections.reverse(postList);
+                myfotosAdapter.notifyDataSetChanged();
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
+    }
+
+    private void MySaves(){
+        mysaves=new ArrayList<>();
+        DatabaseReference reference=FirebaseDatabase.getInstance().getReference("Saves")
+                .child(firebaseUser.getUid());
+        reference.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                for(DataSnapshot snapshot : dataSnapshot.getChildren()){
+                        mysaves.add(snapshot.getKey());
+
+                }
+                        readSaves();
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
+    }
+
+    private void readSaves(){
+        DatabaseReference reference =FirebaseDatabase.getInstance().getReference("Posts");
+        reference.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                postList_saves.clear();
+                for (DataSnapshot snapshot : dataSnapshot.getChildren() )
+                {
+                    Post post=snapshot.getValue(Post.class);
+
+                    for(String id : mysaves)
+                    {
+
+                        if(post.getPostimage().equals(id))
+                        {
+                                postList_saves.add(post);
+                        }
+
+                    }
+                }
+                myfotosAdapter_saves.notifyDataSetChanged();
             }
 
             @Override
